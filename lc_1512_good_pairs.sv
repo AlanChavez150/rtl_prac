@@ -34,6 +34,10 @@ module lc_1512_good_pairs
 
 endmodule
 
+///
+// TEST BENCH
+///
+
 module tb_lc_1512_good_pairs();
     localparam DATA_SIZE = 8;
 
