@@ -8,6 +8,7 @@ module lc_1512_good_pairs
 
     input        [DATA_SIZE-1:0] in_tdata,
     input                        in_tvalid,
+    //input                        in_tlast,
     output                       in_tready,
 
     output logic [DATA_SIZE-1:0] pairs
