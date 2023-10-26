@@ -13,9 +13,9 @@ module lc_1512_good_pairs
 
     output logic [DATA_SIZE-1:0] pairs
 );
-    logic [2**DATA_SIZE -1: 0] set;
 
     assign in_tready = !rst;
+    logic [2**DATA_SIZE -1: 0] set;
 
     always @(posedge clk) begin
         if (rst) begin
