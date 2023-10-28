@@ -86,11 +86,11 @@ module lc_1252_odd_matrix #(
     output            out_tvalid
 );
 
-    reg       ind_loaded; // low unitl all ind have been loaded
-    reg [7:0] m_reg;
-    reg [7:0] n_reg;
-    reg [MAX_IND_LEN-1:0][1:0][7:0] indices;
-    reg [$clog2(MAX_IND_LEN):0]     ind_ptr;
+    logic       ind_loaded; // low unitl all ind have been loaded
+    logic [7:0] m_reg;
+    logic [7:0] n_reg;
+    logic [MAX_IND_LEN-1:0][1:0][7:0] indices;
+    logic [$clog2(MAX_IND_LEN):0]     ind_ptr;
 
     // state machine to load indicies into an array
     assign ind_tready = !rst && !ind_loaded;
@@ -116,5 +116,91 @@ module lc_1252_odd_matrix #(
         end
     end
 
+endmodule
+
+
+module tb_lc_1252_odd_matrix();
+
+    logic            clk;
+    logic            rst;
+
+    logic      [7:0] m;          // saved on tlast+tvalid signal
+    logic      [7:0] n;
+
+    logic [1:0][7:0] ind_tdata;
+    logic            ind_tvalid;
+    logic            ind_tlast;
+    wire             ind_tready;
+
+    wire       [7:0] odd_cells;
+    wire             out_tvalid;
+
+    lc_1252_odd_matrix UUT(
+        .clk       ( clk        ),
+        .rst       ( rst        ),
+
+        .m         ( m          ), // saved on tlast+tvalid signal
+        .n         ( n          ),
+
+        .ind_tdata ( ind_tdata  ),
+        .ind_tvalid( ind_tvalid ),
+        .ind_tlast ( ind_tlast  ),
+        .ind_tready( ind_tready ),
+
+        .odd_cells ( odd_cells  ),
+        .out_tvalid( out_tvalid )
+    );
+
+    always #5 clk = !clk;
+    initial begin
+        $dumpfile("tb_results/lc_1252_odd_matrix.vcd");
+        $dumpvars(0, tb_lc_1252_odd_matrix);
+
+        rst = 1;
+        clk = 0;
+        m = 0;
+        n = 0;
+        ind_tdata = 0;
+        ind_tvalid = 0;
+        ind_tlast = 0;
+        repeat (5) @(posedge clk);
+        rst = 0;
+        wait (ind_tready);
+        $display("Sending in data. 2x3 [[0,1],[1,1]]");
+        m = 2;
+        n = 3;
+        send_coor(0, 1, 0);
+        send_coor(1, 1, 1);
+        ind_tvalid = 0;
+        repeat(1) @(posedge clk);
+
+        if(!UUT.ind_loaded || UUT.m_reg != m || UUT.n_reg != n) begin
+            $error("Assertion error");
+            $fatal(1);
+        end
+        print_ind(0);
+
+        repeat (1) @(posedge clk);
+        $finish;
+    end
+
+    // TASKS
+    task print_ind(input dummy);
+        $display("(%1d, %1d)",UUT.indices[0][0], UUT.indices[0][1]);
+        $display("(%1d, %1d)",UUT.indices[1][0], UUT.indices[1][1]);
+    endtask
+
+
+    task send_coor(
+        input [7:0] row,
+        input [7:0] col,
+        input       last
+    );
+        ind_tdata[0] = row;
+        ind_tdata[1] = col;
+        ind_tvalid   = 1;
+        ind_tlast    = last;
+        repeat (1) @(posedge clk);
+    endtask
 
 endmodule
