@@ -116,6 +116,8 @@ module lc_1252_odd_matrix #(
         end
     end
 
+    // state machine for actual calculation
+
 endmodule
 
 
