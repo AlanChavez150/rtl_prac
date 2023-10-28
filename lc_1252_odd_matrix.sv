@@ -67,3 +67,54 @@
 //
 //     return sum;
 // }
+
+module lc_1252_odd_matrix #(
+    parameter MAX_IND_LEN = 100
+)(
+    input             clk,
+    input             rst,
+
+    input       [7:0] m,          // saved on tlast+tvalid signal
+    input       [7:0] n,
+
+    input  [1:0][7:0] ind_tdata,
+    input             ind_tvalid,
+    input             ind_tlast,
+    output            ind_tready,
+
+    output      [7:0] odd_cells,
+    output            out_tvalid
+);
+
+    reg       ind_loaded; // low unitl all ind have been loaded
+    reg [7:0] m_reg;
+    reg [7:0] n_reg;
+    reg [MAX_IND_LEN-1:0][1:0][7:0] indices;
+    reg [$clog2(MAX_IND_LEN):0]     ind_ptr;
+
+    // state machine to load indicies into an array
+    assign ind_tready = !rst && !ind_loaded;
+
+    integer i;
+    always @(posedge clk) begin
+        if(rst) begin
+            ind_loaded <= 0;
+            m_reg <= 0;
+            n_reg <= 0;
+            ind_ptr <= 0;
+            indices <= 0;
+        end else begin
+            if(ind_tvalid) begin
+                indices[ind_ptr] <= ind_tdata;
+                ind_ptr <= ind_ptr + 1;
+                if(ind_tlast) begin
+                    ind_loaded <= 1;
+                    m_reg <= m;
+                    n_reg <= n;
+                end
+            end
+        end
+    end
+
+
+endmodule
