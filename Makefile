@@ -1,6 +1,6 @@
 *.sv: FORCE
 	@mkdir -pv bin/
-	iverilog $@ -o bin/$@ -I lib/ -g2005-sv
+	iverilog $@ -o bin/$@ -I lib/ -g2012
 	@bin/$@
 FORCE:
 

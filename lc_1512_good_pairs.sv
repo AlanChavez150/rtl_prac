@@ -26,7 +26,6 @@
 //  1 <= nums[i] <= 100
 //  A pair (i, j) is called good if nums[i] == nums[j] and i < j.
 
-
 module lc_1512_good_pairs
 #(
     parameter DATA_SIZE=32
@@ -95,7 +94,7 @@ module tb_lc_1512_good_pairs();
 
     always @(posedge clk) begin
         if(!rst)
-            $display("clk=%01d in_tdata=%8d in_tvalid=%1d in_tready=%1d pairs=%8d", clk, in_tdata, in_tvalid, in_tready, pairs);
+            $display("in_tdata=%8d in_tvalid=%1d in_tready=%1d pairs=%8d", in_tdata, in_tvalid, in_tready, pairs);
     end
 
     initial begin
@@ -109,63 +108,46 @@ module tb_lc_1512_good_pairs();
         wait (in_tready);
 
         // sends in [5, 123, 5, 3, 5, 4, 2, 1, 0, 26, 255, 255]
-        in_tdata = 5;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 123;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 5;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 3;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 5;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 4;
-        in_tvalid =1;
-        wait (!clk); wait(clk);
-        in_tdata = 2;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 1;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 0;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 26;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 255;
-        in_tvalid = 1;
-        wait (!clk); wait(clk);
-        in_tdata = 255;
-        in_tvalid = 1;
-        // make sure tvalid works
-        wait (!clk); wait(clk);
-        in_tdata = 8'hDEADBEEF;
-        in_tvalid = 0;
-        wait (!clk); wait(clk);
-        in_tdata = 8'hDEADBEEF;
-        in_tvalid = 0;
-        wait (!clk); wait(clk);
+        good_write(5);
+        good_write(123);
+        good_write(5);
+        good_write(3);
+        good_write(5);
+        good_write(4);
+        good_write(2);
+        good_write(1);
+        good_write(0);
+        good_write(26);
+        good_write(255);
+        good_write(255);
+        bad_write('hDEADBEEF);
+        bad_write('hDEADBEEF);
 
         in_tdata = 0;
         in_tvalid = 0;
         wait (!clk); wait(clk);
-
 
         if (pairs != 2) begin
             wait(!clk);
             $error("Assertion Error: 2 != %d", pairs);
+            $fatal(1);
         end
 
         wait(!clk);
         $display("tb_lc_1512_good_pair succeeded.");
         $finish;
     end
+
+    task good_write(input integer num);
+        in_tdata = num;
+        in_tvalid = 1;
+        wait(!clk); wait(clk);
+    endtask
+
+    task bad_write(input integer num);
+        in_tdata = num;
+        in_tvalid = 0;
+        wait(!clk); wait(clk);
+    endtask
 
 endmodule
