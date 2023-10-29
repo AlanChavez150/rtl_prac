@@ -1,11 +1,11 @@
 *.sv: FORCE
 	@mkdir -pv tb_results/
-	iverilog $@ -o tb_results/$@.vvp -I lib/ -g2012
-	@vvp tb_results/$@.vvp
+	iverilog $@ -o tb_results/${basename $@}.vvp -I lib/ -g2012 -s tb_${basename $@}
+	@vvp tb_results/${basename $@}.vvp
 
 lib/*.sv: FORCE
 	@mkdir -pv tb_results/lib/
-	iverilog $@ -o tb_results/$@.vvp -I lib/ -g2012
+	iverilog $@ -o tb_results/${basename $@}.vvp -I lib/ -g2012 -s tb_${basename $@}
 	@vvp tb_results/$@.vvp
 
 FORCE:

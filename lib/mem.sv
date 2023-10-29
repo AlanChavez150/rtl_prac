@@ -1,4 +1,4 @@
-// Simle memory model with two ports for access based on bram
+// Simple memory model with two ports for access based on bram
 module mem #(
     parameter DATA_WIDTH=8,
     parameter ADDR_WIDTH=8
